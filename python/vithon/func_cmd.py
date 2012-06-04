@@ -231,13 +231,25 @@ class _vimcmd(object):
     def name(self):
         return self.__name
 
-    def __call__(self, args):
+    def __call__(self, args='', capture=False):
         cmd = ('%s%s %s' % (
                         _trans_range(None),
                         self.__name,
                         args))
 #        print cmd
-        vim.command(cmd)
+        if not capture:
+            vim.command(cmd)
+            return
+
+        # capture output using redirection wrapper
+        try:
+            wrapper = 'redir @"> | silent {0}'.format(cmd)
+            vim.command(wrapper)
+        finally:
+            # end redirection
+            vim.command('redir END')
+
+        return vim.eval('@"').lstrip()
 
 class _vimcmd_co(object):
     '''
