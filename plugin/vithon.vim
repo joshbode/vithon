@@ -12,10 +12,14 @@ au BufNewFile,BufRead ~/.vithonrc set syntax=python
 function VithonInit()
 python<<ENDPY
 import sys
-import os
+import os.path
 import vim
 
-sys.path.append(os.environ['HOME'] + '/.vim/python')
+for x in vim.eval('&runtimepath').split(','):
+    path = os.path.join(x, 'python')
+    if os.path.exists(path) and path not in sys.path:
+        sys.path.append(path)
+
 import vithon
 ENDPY
 	if filereadable($HOME.'/.vithonrc')
